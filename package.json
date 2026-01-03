@@ -15,6 +15,7 @@
     "@misterdevs/qris-static-to-dynamic": "^1.1.2",
     "@mui/icons-material": "^7.3.6",
     "@mui/material": "^7.3.6",
+    "@mui/system": "^7.3.6",
     "@tanstack/react-query": "^5.90.12",
     "@tanstack/react-router": "^1.141.2",
     "@tanstack/react-table": "^8.21.3",

@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<!-- Added scroll-smooth for better anchor link navigation -->
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kopi Aku - Kopi Berkualitas, Harga Bersahabat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Animate On Scroll (AOS) CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <icon rel="icon" type="image/png" href="https://image2url.com/images/1761181262257-636d5ce0-5d3b-4be6-a084-f3ff601abc8f.png"/>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Source+Code+Pro:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Set a light, neutral background with a very subtle blue tint */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f8fc; /* Lighter and slightly cooler than gray-100 */
+        }
+        .brand-blue {
+            background-color: #2a1bed;
+        }
+        .text-brand-blue {
+            color: #2a1bed;
+        }
+        .dark-blue-text {
+            color: #1c0cdc;
+        }
+        .royal-blue-text {
+            color: #3c33dc;
+        }
+        
+        /* Hero overlay changed for better contrast */
+        .hero-section {
+            background: linear-gradient(rgba(31, 41, 55, 0.7), rgba(31, 41, 55, 0.7)), var(--hero-bg-image, url('https://images.unsplash.com/photo-1559496417-e7f25cb247f3?q=80&w=3456&auto=format&fit=crop')) no-repeat center center;
+            background-size: cover;
+        }
+        
+        /* Added text-shadow to hero title for better readability and 'pop' */
+        .hero-section h2 {
+            text-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Kept the cool receipt style */
+        .receipt-container {
+            font-family: 'Source Code Pro', monospace;
+            background: white;
+            padding: 2.5rem 2rem 2rem 2rem;
+            max-width: 450px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            color: #1f2937;
+        }
+        .receipt-container::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 12px;
+            /* Updated color to match the new body background */
+            background: linear-gradient(-45deg, #f7f8fc 8px, transparent 0), linear-gradient(45deg, #f7f8fc 8px, transparent 0);
+            background-position: left bottom;
+            background-size: 18px 18px;
+            background-repeat: repeat-x;
+        }
+
+        /* Added subtle hover effect for menu items */
+        .menu-item-list li {
+            transition: all 0.2s ease-in-out;
+        }
+        .menu-item-list li:hover {
+            background-color: #f7f8fc; /* Subtle hover background */
+            transform: scale(1.03); /* Slightly larger on hover */
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+            border-radius: 0.25rem;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased">
+
+    <!-- Header -->
+    <header class="bg-[#2a1bed] text-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <!-- Added pop animation to logo -->
+                <a href="#" class="flex flex-col items-center transform transition-all duration-300 hover:scale-105 hover:-translate-y-0.5">
+                    <img width="80" height="80" src="https://image2url.com/images/1761181262257-636d5ce0-5d3b-4be6-a084-f3ff601abc8f.png" alt="KOPI AKU Logo">
+                </a>
+            </div>
+            <nav class="hidden md:flex space-x-8">
+                <!-- Added pop animation to nav links -->
+                <a href="#tentang" class="hover:text-gray-300 transform transition-transform duration-300 hover:scale-110">Tentang Kami</a>
+                <a href="#menu" class="hover:text-gray-300 transform transition-transform duration-300 hover:scale-110">Menu</a>
+                <a href="#lokasi" class="hover:text-gray-300 transform transition-transform duration-300 hover:scale-110">Lokasi</a>
+            </nav>
+            <!-- Added pop animation to button -->
+            <a href="https://wa.me/6287814811610" target="_blank" class="bg-white text-[#2a1bed] font-bold py-2 px-5 rounded-full hover:bg-gray-200 transform transition-all duration-300 hover:scale-105 hover:shadow-lg text-sm sm:text-base">
+                Hubungi Kami
+            </a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <!-- Increased vertical padding for more impact -->
+    <section class="hero-section text-white py-32 md:py-48">
+        <div class="container mx-auto text-center px-6">
+            <h2 id="hero-title" class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight" data-aos="fade-up">Kopi Berkualitas, Harga Bersahabat.</h2>
+            <p id="hero-description" class="text-lg md:text-xl max-w-3xl mx-auto leading-relaxed" data-aos="fade-up" data-aos-delay="200">Kami percaya setiap orang berhak menikmati secangkir kopi yang baik tanpa harus menguras dompet. Temukan semangatmu di setiap tegukan.</p>
+        </div>
+    </section>
+
+    <!-- Tentang Kami Section -->
+    <!-- Set to bg-white for contrast -->
+    <section id="tentang" class="py-20 md:py-28 bg-white overflow-hidden">
+        <div class="container mx-auto px-6">
+            
+            <!-- NEW: 2-column layout to fill space -->
+            <div class="grid px-24 lg:grid-cols-2 gap-10 items-center mb-20">
+                <!-- Carousel: replaces single static image -->
+                <div data-aos="fade-right">
+                    <div id="aboutCarousel" class="relative overflow-hidden rounded-2xl shadow-lg" aria-roledescription="carousel">
+                        <!-- Slides container -->
+                                <ul class="carousel-slides list-none m-0 p-0 relative w-full h-full" style="padding-bottom:125%"> <!-- aspect 4/5 (1080x1350) -->
+                            <li class="carousel-slide absolute inset-0 opacity-0 transition-opacity duration-500 ease-in-out" data-slide="0" aria-hidden="true">
+                                <img width="1080" height="1350" src="https://image2url.com/images/1761188402746-8047f73e-0b1e-4312-aeb5-bb1917613a72.png" alt="3" class="w-full h-full object-cover rounded-2xl" onerror="this.src='https://placehold.co/1080x1350/2a1bed/white?text=Kopi+Pilihan'">
+                            </li>
+                            <li class="carousel-slide absolute inset-0 opacity-0 transition-opacity duration-500 ease-in-out" data-slide="1" aria-hidden="true">
+                                <img width="1080" height="1350" src="https://image2url.com/images/1761189286834-fb6a6ade-7443-4940-a223-94d3c82ad870.png" alt="4" class="w-full h-full object-cover rounded-2xl" onerror="this.src='https://placehold.co/1080x1350/2a1bed/white?text=Penggilingan'">
+                            </li>
+                            <li class="carousel-slide absolute inset-0 opacity-0 transition-opacity duration-500 ease-in-out" data-slide="2" aria-hidden="true">
+                                <img width="1080" height="1350" src="https://image2url.com/images/1761189318166-83f0740f-cdff-4e8e-b56d-7bc86491dccb.png" alt="5" class="w-full h-full object-cover rounded-2xl" onerror="this.src='https://placehold.co/1080x1350/2a1bed/white?text=Secangkir+Kopi'">
+                            </li>
+                            <li class="carousel-slide absolute inset-0 opacity-0 transition-opacity duration-500 ease-in-out" data-slide="2" aria-hidden="true">
+                                <img width="1080" height="1350" src="https://image2url.com/images/1761189429975-e2089d6e-1dd7-4ae9-b7e7-6e1695761eed.png" alt="6" class="w-full h-full object-cover rounded-2xl" onerror="this.src='https://placehold.co/1080x1350/2a1bed/white?text=Secangkir+Kopi'">
+                            </li>
+                            <li class="carousel-slide absolute inset-0 opacity-0 transition-opacity duration-500 ease-in-out" data-slide="2" aria-hidden="true">
+                                <img width="1080" height="1350" src="https://image2url.com/images/1761189460252-d4005c29-7ef2-4157-bdea-be49268a3d85.png" alt="7" class="w-full h-full object-cover rounded-2xl" onerror="this.src='https://placehold.co/1080x1350/2a1bed/white?text=Secangkir+Kopi'">
+                            </li>
+                            <li class="carousel-slide absolute inset-0 opacity-0 transition-opacity duration-500 ease-in-out" data-slide="2" aria-hidden="true">
+                                <img width="1080" height="1350" src="https://image2url.com/images/1761189484720-7be2d045-286c-44c3-949b-20c4e797b05d.png" alt="8" class="w-full h-full object-cover rounded-2xl" onerror="this.src='https://placehold.co/1080x1350/2a1bed/white?text=Secangkir+Kopi'">
+                            </li>
+                            <li class="carousel-slide absolute inset-0 opacity-0 transition-opacity duration-500 ease-in-out" data-slide="2" aria-hidden="true">
+                                <img width="1080" height="1350" src="https://image2url.com/images/1761189503493-1b3f1855-2092-44b4-9c07-67825403a20d.png" alt="9" class="w-full h-full object-cover rounded-2xl" onerror="this.src='https://placehold.co/1080x1350/2a1bed/white?text=Secangkir+Kopi'">
+                            </li>
+                        </ul>
+
+                        <!-- Indicators -->
+                        <div class="absolute left-1/2 transform -translate-x-1/2 bottom-4 flex space-x-2 z-20">
+                            <button class="carousel-indicator w-3 h-3 rounded-full bg-white/70 ring-1 ring-white" aria-label="Slide 1" data-to="0"></button>
+                            <button class="carousel-indicator w-3 h-3 rounded-full bg-white/40 ring-1 ring-white" aria-label="Slide 2" data-to="1"></button>
+                            <button class="carousel-indicator w-3 h-3 rounded-full bg-white/40 ring-1 ring-white" aria-label="Slide 3" data-to="2"></button>
+                            <button class="carousel-indicator w-3 h-3 rounded-full bg-white/70 ring-1 ring-white" aria-label="Slide 4" data-to="3"></button>
+                            <button class="carousel-indicator w-3 h-3 rounded-full bg-white/40 ring-1 ring-white" aria-label="Slide 5" data-to="4"></button>
+                            <button class="carousel-indicator w-3 h-3 rounded-full bg-white/40 ring-1 ring-white" aria-label="Slide 6" data-to="5"></button>
+                            <button class="carousel-indicator w-3 h-3 rounded-full bg-white/70 ring-1 ring-white" aria-label="Slide 7" data-to="6"></button>
+                        </div>
+
+                        <!-- Prev / Next controls -->
+                        <button class="carousel-prev absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-white/80 hover:bg-white text-[#2a1bed] rounded-full w-10 h-10 flex items-center justify-center shadow" aria-label="Previous slide">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                        </button>
+                        <button class="carousel-next absolute right-3 top-1/2 -translate-y-1/2 z-20 bg-white/80 hover:bg-white text-[#2a1bed] rounded-full w-10 h-10 flex items-center justify-center shadow" aria-label="Next slide">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <div data-aos="fade-left" data-aos-delay="100">
+                    <h2 class="text-3xl md:text-4xl font-bold text-[#2a1bed] mb-6">Kisah Kopi Aku</h2>
+                    <p id="about-paragraph1" class="text-lg text-gray-600 leading-relaxed">
+                        Kopi Aku lahir dari kecintaan mendalam terhadap kopi dan keresahan akan tingginya harga kopi di sekitar kampus. Kehadiran kami bertujuan untuk mengubah pandangan bahwa kualitas selalu identik dengan harga tinggi.
+                    </p>
+                    <p id="about-paragraph2" class="mt-4 text-lg text-gray-600 leading-relaxed">
+                        Kami ingin membuktikan bahwa kopi berkualitas dapat dinikmati oleh siapa saja.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="max-w-5xl mx-auto">
+                <div class="grid md:grid-cols-2 gap-10 text-center mb-10">
+                    <!-- Visi -->
+                    <!-- Added hover animation -->
+                    <div class="bg-gray-50 p-10 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-2 h-full" data-aos="fade-up" data-aos-delay="100">
+                        <h3 class="text-2xl font-bold text-[#2a1bed] mb-5">Visi Kami</h3>
+                        <p id="about-vision" class="text-gray-700 leading-relaxed">Menjadi merek kopi pilihan mahasiswa dan masyarakat luas dengan menyajikan kopi berkualitas tinggi yang mudah diakses dan terjangkau.</p>
+                    </div>
+                    <!-- Misi -->
+                    <div class="bg-gray-50 p-10 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-2 h-full" data-aos="fade-up" data-aos-delay="200">
+                        <h3 class="text-2xl font-bold text-[#2a1bed] mb-5">Misi Kami</h3>
+                        <ul id="about-mission" class="text-left space-y-2 text-gray-700 list-disc list-inside leading-relaxed">
+                            <li>Menyajikan kualitas unggul</li>
+                            <li>Menciptakan pengalaman berkesan</li>
+                            <li>Berinovasi tanpa henti</li>
+                            <li>Menjadi bagian dari gaya hidup</li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Awal Mula -->
+                <div class="bg-gray-50 p-10 rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-2 text-center" data-aos="fade-up" data-aos-delay="300">
+                    <h3 class="text-2xl font-bold text-[#2a1bed] mb-5">Awal Mula</h3>
+                    <p id="about-background" class="text-gray-700 leading-relaxed">Perjalanan Kopi Aku dimulai dari tempat yang sederhana di atas kendaraan, di sekitar kampus, hingga di booth kecil di berbagai acara. Dengan semangat yang sama sejak awal, kami terus berkomitmen untuk menyajikan kopi terbaik bagi semua pecinta kopi.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <!-- Background is inherited from body (f7f8fc) -->
+    <section id="menu" class="py-16 md:py-24 overflow-hidden">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-[#2a1bed]">Menu Andalan Kami</h2>
+                <p class="mt-4 text-lg text-gray-600">Diseduh dengan passion, disajikan untuk Anda.</p>
+            </div>
+            
+            <!-- Animated menu card -->
+            <div class="max-w-lg mx-auto bg-white p-8 md:p-12 rounded-xl shadow-lg" data-aos="zoom-in-up">
+                <!-- Prettier Menu title -->
+                <h3 class="text-5xl md:text-6xl font-extrabold text-center mb-10 bg-gradient-to-r from-[#2a1bed] to-indigo-500 bg-clip-text text-transparent tracking-tight">
+                    MENU
+                </h3>
+
+                <div class="space-y-8">
+                    <div>
+                        <h4 class="text-xl font-bold text-[#2a1bed] tracking-wider border-b-2 border-[#2a1bed] pb-2 mb-4">REFRESHMENT DRINK</h4>
+                        <!-- Added class for hover effect -->
+                        <ul class="divide-y divide-dashed divide-blue-200 text-lg text-gray-700 menu-item-list">
+                            <li class="flex justify-between py-3"><span>Espresso</span> <span class="font-semibold">8.000</span></li>
+                            <li class="flex justify-between py-3"><span>Americano</span> <span class="font-semibold">12.000</span></li>
+                            <li class="flex justify-between py-3"><span>American Green Apple</span> <span class="font-semibold">17.000</span></li>
+                            <li class="flex justify-between py-3"><span>American Lemonade</span> <span class="font-semibold">17.000</span></li>
+                            <li class="flex justify-between py-3"><span>Lychee Bliss</span> <span class="font-semibold">18.000</span></li>
+                            <li class="flex justify-between py-3"><span>Sweet Berries</span> <span class="font-semibold">18.000</span></li>
+                        </ul>
+                    </div>
+    
+                    <div>
+                        <h4 class="text-xl font-bold text-[#2a1bed] tracking-wider border-b-2 border-[#2a1bed] pb-2 mb-4">CAFE LATTE</h4>
+                        <ul class="divide-y divide-dashed divide-blue-200 text-lg text-gray-700 menu-item-list">
+                            <li class="flex justify-between py-3"><span>Hazelnut Latte</span> <span class="font-semibold">16.000</span></li>
+                            <li class="flex justify-between py-3"><span>Salted Caramel Latte</span> <span class="font-semibold">16.000</span></li>
+                            <li class="flex justify-between py-3"><span>Vanilla Latte</span> <span class="font-semibold">16.000</span></li>
+                            <li class="flex justify-between py-3"><span>Aren Latte</span> <span class="font-semibold">16.000</span></li>
+                            <li class="flex justify-between py-3"><span>Latte</span> <span class="font-semibold">15.000</span></li>
+                        </ul>
+                    </div>
+    
+                    <div>
+                        <h4 class="text-xl font-bold text-[#2a1bed] tracking-wider border-b-2 border-[#2a1bed] pb-2 mb-4">MANUAL BREW</h4>
+                        <ul class="divide-y divide-dashed divide-blue-200 text-lg text-gray-700 menu-item-list">
+                            <li class="flex justify-between py-3"><span>V60/Japanese</span> <span class="font-semibold">20.000</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Konten Promosi Section -->
+    <!-- Set to bg-white for alternating color -->
+    <section id="promosi" class="py-20 md:py-28 bg-gradient-to-br from-blue-50 to-white overflow-hidden">
+        <div class="container mx-auto px-6 text-center">
+            
+            <h2 id="promotion-title" class="text-4xl md:text-5xl font-extrabold tracking-tight mb-12" data-aos="fade-up">
+                <span class="bg-gradient-to-r from-[#2a1bed] via-indigo-500 to-purple-600 bg-clip-text text-transparent">
+                    Promosi Spesial Untukmu!
+                </span>
+            </h2>
+            
+            <div class="max-w-3xl mx-auto bg-gradient-to-br from-[#2a1bed] to-indigo-500 p-1 rounded-2xl shadow-xl 
+                        transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 hover:scale-[1.02]"
+                 data-aos="fade-up" data-aos-delay="200">
+                
+                <div class="bg-white p-8 md:p-10 rounded-xl">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-8 uppercase tracking-widest">
+                        Rules Promo Spesial
+                    </h3>
+                    
+                    <div class="space-y-6 text-left">
+
+                        <div class="flex items-start space-x-4" data-aos="fade-up" data-aos-delay="300">
+                            <div class="flex-shrink-0 w-10 h-10 bg-[#2a1bed] rounded-full flex items-center justify-center 
+                                        text-white font-bold text-xl shadow-md">
+                                1
+                            </div>
+                            <p class="text-lg text-slate-700 pt-1">
+                                Temukan booth <strong class="text-slate-900">KOPI AKU</strong> di sekitarmu (Cek lokasi update di Instagram kami!)
+                            </p>
+                        </div>
+
+                        <div class="flex items-start space-x-4" data-aos="fade-up" data-aos-delay="400">
+                            <div class="flex-shrink-0 w-10 h-10 bg-[#2a1bed] rounded-full flex items-center justify-center 
+                                        text-white font-bold text-xl shadow-md">
+                                2
+                            </div>
+                            <p class="text-lg text-slate-700 pt-1">
+                                Ajak minimal <strong class="text-slate-900">2 temanmu</strong> untuk beli KOPI AKU bareng (Wajib beli di waktu & tempat yang sama, ya!)
+                            </p>
+                        </div>
+
+                        <div class="flex items-start space-x-4" data-aos="fade-up" data-aos-delay="500">
+                            <div class="flex-shrink-0 w-10 h-10 bg-[#2a1bed] rounded-full flex items-center justify-center 
+                                        text-white font-bold text-xl shadow-md">
+                                3
+                            </div>
+                            <p class="text-lg text-slate-700 pt-1">
+                                Follow Instagram <a href="https://www.instagram.com/kopiakuu" target="_blank" class="font-bold text-[#2a1bed] hover:underline">@kopiakuu</a> dan tunjukkan ke kasir (Follow dulu biar promo kamu valid!)
+                            </p>
+                        </div>
+
+                        <div class="flex items-start space-x-4" data-aos="fade-up" data-aos-delay="600">
+                            <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full 
+                                        flex items-center justify-center text-white font-bold text-xl shadow-md">
+                                4
+                            </div>
+                            <p class="text-lg text-slate-700 pt-1">
+                                Langsung dapetin kopimu dengan 
+                                <strong class="font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-emerald-600">
+                                    SETENGAH HARGA
+                                </strong> 
+                                (Khusus untuk kamu yang ngajak teman dan udah follow)
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lokasi & Kontak Section -->
+    <!-- Background is gray from body -->
+    <section id="lokasi" class="py-20 md:py-28 overflow-hidden">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-[#2a1bed]">Temukan Kami Di Sini</h2>
+                <p class="mt-4 text-lg text-gray-600 leading-relaxed">Mampir untuk secangkir kopi atau sekadar menyapa!</p>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-10 items-center">
+                <!-- Info card -->
+                <div class="bg-white p-10 md:p-12 rounded-2xl shadow-lg space-y-10" data-aos="fade-right">
+                    <!-- Jam Operasional -->
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 pt-1">
+                            <svg class="h-7 w-7 text-[#2a1bed]" xmlns="http://www.w.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-xl font-bold text-gray-900">Jam Operasional</h3>
+                            <p id="contact-hours" class="text-2xl font-bold text-[#2a1bed] mt-1">20:00 - 02:00 <span class="text-lg text-gray-600 font-medium">WIB</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Alamat -->
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 pt-1">
+                            <svg class="h-7 w-7 text-[#2a1bed]" xmlns="http://www.w.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-xl font-bold text-gray-900">Alamat</h3>
+                            <p id="contact-address" class="text-lg text-gray-600 mt-1 leading-relaxed">Jl. Kaum Sari No.23, RT.02/RW.05, Cibuluh, Kec. Bogor Utara, Kota Bogor, Jawa Barat 16151</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Kontak -->
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 pt-1">
+                           <svg class="h-7 w-7 text-[#2a1bed]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-2.822-1.423-5.143-3.744-6.566-6.566l1.293-.97c.362-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 0 0-1.091-.852H4.5A2.25 2.25 0 0 0 2.25 4.5v2.25Z" />
+                           </svg>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-xl font-bold text-gray-900">Kontak</h3>
+                            <div class="mt-3 flex flex-col space-y-4">
+                                <!-- Added hover animation -->
+                                <a href="https://wa.me/6287814811610" target="_blank" class="flex items-center space-x-3 text-lg text-gray-600 hover:text-[#2a1bed] transition-all duration-300 group transform hover:scale-105">
+                                    <svg class="h-6 w-6 text-gray-400 group-hover:text-[#2a1bed] transition-colors" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21 5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zM12.04 20.15c-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31c-.82-1.31-1.26-2.83-1.26-4.38 0-4.54 3.69-8.23 8.24-8.23 2.22 0 4.31.87 5.82 2.39 1.52 1.51 2.39 3.6 2.39 5.83.01 4.54-3.68 8.23-8.22 8.23zm4.52-6.13c-.25-.12-1.47-.72-1.7-.8s-.39-.12-.56.12c-.17.25-.64.8-.79.96s-.3.19-.56.06c-.26-.12-1.08-.4-2.06-1.27s-1.47-1.44-1.64-1.69c-.17-.25-.02-.38.11-.51s.25-.29.37-.43c.13-.14.17-.25.25-.41s.04-.3-.02-.43c-.06-.12-.56-1.34-.76-1.84s-.4-.42-.55-.43c-.15 0-.31-.01-.48-.01s-.43.06-.66.31c-.23.25-.87.85-.87 2.07s.9 2.4, 1.02 2.56c.12.17 1.76 2.67 4.25 3.73.59.25 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.67-1.18s.21-1.09.15-1.18c-.07-.1-.23-.16-.48-.28z"></path></svg>
+                                    <span>087814811610</span>
+                                </a>
+                                <a href="https://www.instagram.com/kopiakuu" target="_blank" class="flex items-center space-x-3 text-lg text-gray-600 hover:text-[#2a1bed] transition-all duration-300 group transform hover:scale-105">
+                                    <svg class="h-6 w-6 text-gray-400 group-hover:text-[#2a1bed] transition-colors" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.85s-.011 3.584-.069 4.85c-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07s-3.584-.012-4.85-.07c-3.252-.148-4.771-1.691-4.919-4.919-.058-1.265-.069-1.645-.069-4.85s.011-3.584.069-4.85c.149-3.225 1.664-4.771 4.919-4.919 1.266-.057 1.644-.07 4.85-.07zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948s.014 3.667.072 4.947c.2 4.359 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072s3.667-.014 4.947-.072c4.359-.2 6.78-2.618 6.98-6.98.058-1.281.072-1.689.072-4.947s-.014-3.667-.072-4.947c-.2-4.359-2.618-6.78-6.98-6.98-1.281-.059-1.689-.073-4.948-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.162 6.162 6.162 6.162-2.759 6.162-6.162-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4s1.791-4 4-4 4 1.79 4 4-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.441 1.441 1.441 1.441-.645 1.441-1.441-.645-1.44-1.441-1.44z"></path></svg>
+                                    <span>@kopiakuu</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Map -->
+                <div class="rounded-2xl overflow-hidden shadow-lg h-96 lg:h-full" data-aos="fade-left">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.7505294578053!2d106.80663187499317!3d-6.553289093433621!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69c41a3100349d%3A0x63351a9c33e8b70!2sJl.%20Kaum%Sari%20No.23%2C%20RT.02%2FRW.05%2C%20Cibuluh%2C%2C%20Kec.%20Bogor%20Utara%2C%20Kota%20Bogor%2C%20Jawa%20Barat%2016151!5e0!3m2!1sen!2sid!4v1716966020580!5m2!1sen!2sid" 
+                            width="100%" 
+                            height="100%" 
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Back to Top Button -->
+    <!-- Added transition-all for smooth opacity change -->
+    <button id="backToTopBtn" class="fixed bottom-8 right-8
+        bg-[#2a1bed] text-white p-3 rounded-full shadow-lg 
+        hover:bg-indigo-600 transition-all duration-300 
+        opacity-0 hidden z-50" 
+        aria-label="Back to Top">
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+        </svg>
+    </button>
+
+    <!-- Footer -->
+    <footer class="bg-[#2a1bed] text-white py-12">
+        <div class="container mx-auto px-6 text-center" data-aos="fade-up" data-aos-anchor-placement="top-bottom">
+            <p class="text-gray-200">&copy; 2024 Kopi Aku. Dibuat dengan ❤ di Bogor.</p>
+        </div>
+    </footer>
+
+    <!-- Animate On Scroll (AOS) JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- API Functions -->
+    <script src="./api.js"></script>
+    
+    <!-- Content Loader -->
+    <script src="./content-loader.js"></script>
+    
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800, // Animation duration
+            once: true,      // Whether animation should happen only once
+            offset: 50       // Offset (in px) from the original trigger point
+        });
+
+        // --- Back to Top Button Script ---
+        const backToTopBtn = document.getElementById('backToTopBtn');
+
+        const scrollFunction = () => {
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                backToTopBtn.classList.remove('hidden');
+                setTimeout(() => {
+                    backToTopBtn.classList.remove('opacity-0');
+                }, 10);
+            } else {
+                backToTopBtn.classList.add('opacity-0');
+                setTimeout(() => {
+                    backToTopBtn.classList.add('hidden');
+                }, 300); // Match transition duration
+            }
+        };
+
+        const scrollToTop = () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        };
+
+        window.addEventListener('scroll', scrollFunction);
+        backToTopBtn.addEventListener('click', scrollToTop);
+    </script>
+
+    <!-- Carousel script (with swipe support) -->
+    <script>
+        (function() {
+            const carousel = document.getElementById('aboutCarousel');
+            if (!carousel) return;
+
+            const slides = Array.from(carousel.querySelectorAll('.carousel-slide'));
+            const prevBtn = carousel.querySelector('.carousel-prev');
+            const nextBtn = carousel.querySelector('.carousel-next');
+            const indicators = Array.from(carousel.querySelectorAll('.carousel-indicator'));
+
+            let current = 0;
+            const intervalMs = 4000;
+            let timer = null;
+            let isPaused = false;
+
+            // Swipe state
+            let pointerDown = false;
+            let startX = 0;
+            let currentX = 0;
+            const swipeThreshold = 50; // px
+
+            function goTo(index, animate = true) {
+                if (index < 0) index = slides.length - 1;
+                if (index >= slides.length) index = 0;
+
+                slides.forEach((s, i) => {
+                    const hidden = i !== index;
+                    s.style.opacity = hidden ? '0' : '1';
+                    s.setAttribute('aria-hidden', hidden ? 'true' : 'false');
+                    if (!animate) s.style.transition = 'none';
+                    else s.style.transition = '';
+                });
+
+                indicators.forEach((btn, i) => {
+                    if (i === index) {
+                        btn.classList.remove('bg-white/40');
+                        btn.classList.add('bg-white/70');
+                        btn.setAttribute('aria-current', 'true');
+                    } else {
+                        btn.classList.remove('bg-white/70');
+                        btn.classList.add('bg-white/40');
+                        btn.removeAttribute('aria-current');
+                    }
+                });
+
+                carousel.setAttribute('data-current-slide', index);
+                current = index;
+            }
+
+            function next() { goTo(current + 1); }
+            function prev() { goTo(current - 1); }
+
+            function start() {
+                stop();
+                timer = setInterval(() => {
+                    if (!isPaused) next();
+                }, intervalMs);
+            }
+
+            function stop() {
+                if (timer) {
+                    clearInterval(timer);
+                    timer = null;
+                }
+            }
+
+            // Controls
+            nextBtn.addEventListener('click', () => { next(); start(); });
+            prevBtn.addEventListener('click', () => { prev(); start(); });
+
+            indicators.forEach((btn) => {
+                btn.addEventListener('click', (e) => {
+                    const to = Number(btn.getAttribute('data-to'));
+                    goTo(to);
+                    start();
+                });
+            });
+
+            // Pause on hover/focus
+            carousel.addEventListener('mouseenter', () => { isPaused = true; });
+            carousel.addEventListener('mouseleave', () => { isPaused = false; });
+            carousel.addEventListener('focusin', () => { isPaused = true; });
+            carousel.addEventListener('focusout', () => { isPaused = false; });
+
+            // Keyboard navigation
+            carousel.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft') { prev(); start(); }
+                if (e.key === 'ArrowRight') { next(); start(); }
+            });
+
+            // Pointer / touch swipe support
+            function onPointerDown(e) {
+                pointerDown = true;
+                startX = e.type === 'touchstart' ? e.touches[0].clientX : e.clientX;
+                currentX = startX;
+                isPaused = true; // pause autoplay while interacting
+            }
+
+            function onPointerMove(e) {
+                if (!pointerDown) return;
+                currentX = e.type === 'touchmove' ? e.touches[0].clientX : e.clientX;
+                // We could add visual feedback here (drag transform) if desired
+            }
+
+            function onPointerUp(e) {
+                if (!pointerDown) return;
+                pointerDown = false;
+                const dx = currentX - startX;
+                if (Math.abs(dx) > swipeThreshold) {
+                    if (dx < 0) { // swiped left -> next
+                        next();
+                    } else { // swiped right -> prev
+                        prev();
+                    }
+                }
+                // small delay before resuming autoplay to avoid immediate flip
+                setTimeout(() => { isPaused = false; }, 300);
+                start();
+            }
+
+            // Add both pointer and touch events for broad support
+            carousel.addEventListener('pointerdown', onPointerDown, { passive: true });
+            window.addEventListener('pointermove', onPointerMove, { passive: true });
+            window.addEventListener('pointerup', onPointerUp, { passive: true });
+
+            // Touch fallback for older browsers
+            carousel.addEventListener('touchstart', onPointerDown, { passive: true });
+            window.addEventListener('touchmove', onPointerMove, { passive: true });
+            window.addEventListener('touchend', onPointerUp, { passive: true });
+
+            // Make carousel focusable for keyboard users
+            carousel.setAttribute('tabindex', '0');
+
+            // Initialize
+            goTo(0, false);
+            start();
+        })();
+    </script>
+
+</body>
+</html>

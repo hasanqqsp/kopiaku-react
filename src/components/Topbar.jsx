@@ -78,13 +78,7 @@ export default function Topbar({
           </Typography>
         </Box>
 
-        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-          <IconButton aria-label="notifications" size="medium">
-            <Badge color="error" variant="dot" overlap="circular">
-              <NotificationsIcon fontSize="small" />
-            </Badge>
-          </IconButton>
-        </Box>
+        
       </Toolbar>
     </AppBar>
   );

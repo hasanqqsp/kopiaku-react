@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Table from "@mui/material/Table";
@@ -12,6 +12,7 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
+import Switch from "@mui/material/Switch";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -24,127 +25,117 @@ import InputLabel from "@mui/material/InputLabel";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
-
-// Sample employee data
-const sampleEmployeeData = [
-  {
-    id: 1,
-    name: "Ahmad Rahman",
-    nickname: "Ahmad",
-    username: "ahmad.rahman",
-    position: "Manager",
-    lastLogin: "2025-12-15 09:30",
-  },
-  {
-    id: 2,
-    name: "Siti Nurhaliza",
-    nickname: "Siti",
-    username: "siti.nurhaliza",
-    position: "Kasir",
-    lastLogin: "2025-12-15 08:15",
-  },
-  {
-    id: 3,
-    name: "Budi Santoso",
-    nickname: "Budi",
-    username: "budi.santoso",
-    position: "Barista",
-    lastLogin: "2025-12-14 16:45",
-  },
-  {
-    id: 4,
-    name: "Maya Sari",
-    nickname: "Maya",
-    username: "maya.sari",
-    position: "Kasir",
-    lastLogin: "2025-12-15 10:20",
-  },
-  {
-    id: 5,
-    name: "Rizki Pratama",
-    nickname: "Rizki",
-    username: "rizki.pratama",
-    position: "Barista",
-    lastLogin: "2025-12-13 14:10",
-  },
-];
-
-// Sample attendance data
-const sampleAttendanceData = [
-  {
-    id: 1,
-    name: "Ahmad Rahman",
-    waktuMasuk: "2025-12-15 08:00",
-    waktuKeluar: "2025-12-15 17:00",
-    status: "Hadir",
-  },
-  {
-    id: 2,
-    name: "Siti Nurhaliza",
-    waktuMasuk: "2025-12-15 08:15",
-    waktuKeluar: null,
-    status: "Masih Bekerja",
-  },
-  {
-    id: 3,
-    name: "Budi Santoso",
-    waktuMasuk: "2025-12-15 08:30",
-    waktuKeluar: "2025-12-15 16:30",
-    status: "Hadir",
-  },
-  {
-    id: 4,
-    name: "Maya Sari",
-    waktuMasuk: "2025-12-15 09:00",
-    waktuKeluar: null,
-    status: "Masih Bekerja",
-  },
-  {
-    id: 5,
-    name: "Rizki Pratama",
-    waktuMasuk: "2025-12-14 08:00",
-    waktuKeluar: "2025-12-14 17:15",
-    status: "Hadir",
-  },
-];
+import EditIcon from "@mui/icons-material/Edit";
+import CircularProgress from "@mui/material/CircularProgress";
+import Alert from "@mui/material/Alert";
+import CheckIcon from "@mui/icons-material/Check";
+import { 
+  fetchUsers, 
+  fetchPresences, 
+  addEmployees, 
+  validatePresence,
+  setUserActiveStatus,
+  updateUserProfile 
+} from "../utils/api";
 
 const getAttendanceStatusColor = (status) => {
   switch (status) {
-    case "Hadir":
+    case "Present":
       return "success";
-    case "Masih Bekerja":
-      return "primary";
-    case "Tidak Hadir":
+    case "Working":
+      return "primary";  
+    case "Absent":
       return "error";
     default:
       return "default";
   }
 };
 
+const formatDateTime = (dateString) => {
+  if (!dateString) return "-";
+  return new Date(dateString).toLocaleString('id-ID', {
+    year: 'numeric',
+    month: '2-digit', 
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+};
+
+const getPresenceStatus = (presence) => {
+  if (!presence) return "Absent";
+  if (presence.checkInTime && presence.checkOutTime) return "Present";
+  if (presence.checkInTime && !presence.checkOutTime) return "Working";
+  return "Absent";
+};
+
 export default function EmployeesPage() {
   const [tabValue, setTabValue] = useState(0);
   const [photoModalOpen, setPhotoModalOpen] = useState(false);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [selectedPresence, setSelectedPresence] = useState(null);
   const [addEmployeeModalOpen, setAddEmployeeModalOpen] = useState(false);
+  const [editEmployeeModalOpen, setEditEmployeeModalOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [newEmployee, setNewEmployee] = useState({
     name: "",
-    nickname: "",
     username: "",
-    position: "",
+    email: "",
+    password: "",
+    contact: "",
+    nickname: "",
   });
+  const [editEmployee, setEditEmployee] = useState({
+    name: "",
+    username: "",
+    email: "",
+    contact: "",
+    nickname: "",
+  });
+  
+  // Data states
+  const [employees, setEmployees] = useState([]);
+  const [presences, setPresences] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [validatingPresence, setValidatingPresence] = useState(null);
+
+  // Load data on component mount
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const [employeesData, presencesData] = await Promise.all([
+        fetchUsers({ first: 1000 }),
+        fetchPresences({ first: 1000 })
+      ]);
+      
+      setEmployees(employeesData.nodes || []);
+      setPresences(presencesData.nodes || []);
+    } catch (err) {
+      setError(`Failed to load data: ${err.message}`);
+      console.error('Error loading employee data:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
   };
 
-  const handleViewPhoto = (employee) => {
-    setSelectedEmployee(employee);
+  const handleViewPhoto = (presence) => {
+    setSelectedPresence(presence);
     setPhotoModalOpen(true);
   };
 
   const handleClosePhotoModal = () => {
     setPhotoModalOpen(false);
-    setSelectedEmployee(null);
+    setSelectedPresence(null);
   };
 
   const handleOpenAddEmployeeModal = () => {
@@ -155,16 +146,59 @@ export default function EmployeesPage() {
     setAddEmployeeModalOpen(false);
     setNewEmployee({
       name: "",
-      nickname: "",
       username: "",
-      position: "",
+      email: "",
+      password: "",
+      contact: "",
+      nickname: "",
     });
   };
 
-  const handleAddEmployee = () => {
-    // In a real app, this would make an API call to add the employee
-    console.log("Adding employee:", newEmployee);
-    handleCloseAddEmployeeModal();
+  const handleOpenEditEmployeeModal = (employee) => {
+    setSelectedEmployee(employee);
+    setEditEmployee({
+      name: employee.name,
+      username: employee.username,
+      email: employee.email,
+      contact: employee.contact || "",
+      nickname: employee.nickname || "",
+    });
+    setEditEmployeeModalOpen(true);
+  };
+
+  const handleCloseEditEmployeeModal = () => {
+    setEditEmployeeModalOpen(false);
+    setSelectedEmployee(null);
+    setEditEmployee({
+      name: "",
+      username: "",
+      email: "",
+      contact: "",
+      nickname: "",
+    });
+  };
+
+  const handleAddEmployee = async () => {
+    try {
+      setLoading(true);
+      await addEmployees({
+        name: newEmployee.name,
+        username: newEmployee.username,
+        email: newEmployee.email,
+        password: newEmployee.password,
+        contact: newEmployee.contact || null,
+        nickname: newEmployee.nickname || null,
+      });
+      
+      // Refresh the employees list
+      await loadData();
+      handleCloseAddEmployeeModal();
+    } catch (err) {
+      setError(`Failed to add employee: ${err.message}`);
+      console.error('Error adding employee:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleEmployeeInputChange = (field, value) => {
@@ -174,11 +208,90 @@ export default function EmployeesPage() {
     }));
   };
 
+  const handleEditEmployeeInputChange = (field, value) => {
+    setEditEmployee((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleEditEmployee = async () => {
+    try {
+      setLoading(true);
+      await updateUserProfile({
+        userId: selectedEmployee.id,
+        input: {
+          name: editEmployee.name,
+          username: editEmployee.username,
+          email: editEmployee.email,
+          contact: editEmployee.contact || null,
+          nickname: editEmployee.nickname || null,
+        },
+      });
+      
+      // Refresh the employees list
+      await loadData();
+      handleCloseEditEmployeeModal();
+    } catch (err) {
+      setError(`Failed to update employee: ${err.message}`);
+      console.error('Error updating employee:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleValidatePresence = async (presenceId) => {
+    try {
+      setValidatingPresence(presenceId);
+      await validatePresence(presenceId);
+      
+      // Refresh the presences list
+      await loadData();
+    } catch (err) {
+      setError(`Failed to validate presence: ${err.message}`);
+      console.error('Error validating presence:', err);
+    } finally {
+      setValidatingPresence(null);
+    }
+  };
+
+  const handleToggleEmployeeStatus = async (userId, currentStatus) => {
+    const newStatus = !currentStatus;
+    const actionText = newStatus ? 'activate' : 'deactivate';
+    
+    try {
+      setLoading(true);
+      await setUserActiveStatus({ userId, isActive: newStatus });
+      
+      // Refresh the employees list
+      await loadData();
+    } catch (err) {
+      setError(`Failed to ${actionText} employee: ${err.message}`);
+      console.error(`Error ${actionText}ing employee:`, err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
         Employees
       </Typography>
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
 
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
         <Tabs
@@ -202,37 +315,61 @@ export default function EmployeesPage() {
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>Nama</TableCell>
+                  <TableCell>User ID</TableCell>
                   <TableCell>Waktu Masuk</TableCell>
                   <TableCell>Waktu Keluar</TableCell>
                   <TableCell>Status</TableCell>
+                  <TableCell>Validated</TableCell>
                   <TableCell align="center">Aksi</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {sampleAttendanceData.map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell>{row.name}</TableCell>
-                    <TableCell>{row.waktuMasuk}</TableCell>
-                    <TableCell>{row.waktuKeluar || "-"}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={row.status}
-                        color={getAttendanceStatusColor(row.status)}
-                        size="small"
-                      />
-                    </TableCell>
-                    <TableCell align="center">
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={() => handleViewPhoto(row)}
-                      >
-                        Lihat Foto
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                {presences.map((presence) => {
+                  const status = getPresenceStatus(presence);
+                  return (
+                    <TableRow key={presence.id}>
+                      <TableCell>{presence.userId}</TableCell>
+                      <TableCell>{formatDateTime(presence.checkInTime)}</TableCell>
+                      <TableCell>{formatDateTime(presence.checkOutTime)}</TableCell>
+                      <TableCell>
+                        <Chip
+                          label={status}
+                          color={getAttendanceStatusColor(status)}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={presence.validated ? "Validated" : "Pending"}
+                          color={presence.validated ? "success" : "warning"}
+                          size="small"
+                        />
+                      </TableCell>
+                      <TableCell align="center">
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() => handleViewPhoto(presence)}
+                          sx={{ mr: 1 }}
+                        >
+                          Lihat Foto
+                        </Button>
+                        {!presence.validated && (
+                          <Button
+                            variant="contained"
+                            size="small"
+                            color="success"
+                            startIcon={validatingPresence === presence.id ? <CircularProgress size={16} /> : <CheckIcon />}
+                            onClick={() => handleValidatePresence(presence.id)}
+                            disabled={validatingPresence === presence.id}
+                          >
+                            Validate
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </TableContainer>
@@ -267,18 +404,44 @@ export default function EmployeesPage() {
                   <TableCell>Name</TableCell>
                   <TableCell>Nickname</TableCell>
                   <TableCell>Username</TableCell>
-                  <TableCell>Position</TableCell>
-                  <TableCell>Last Login</TableCell>
+                  <TableCell>Email</TableCell>
+                  <TableCell>Role</TableCell>
+                  <TableCell>Contact</TableCell>
+                  <TableCell align="center">Active Status</TableCell>
+                  <TableCell align="center">Actions</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {sampleEmployeeData.map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell>{row.name}</TableCell>
-                    <TableCell>{row.nickname}</TableCell>
-                    <TableCell>{row.username}</TableCell>
-                    <TableCell>{row.position}</TableCell>
-                    <TableCell>{row.lastLogin}</TableCell>
+                {employees.map((employee) => (
+                  <TableRow key={employee.id}>
+                    <TableCell>{employee.name}</TableCell>
+                    <TableCell>{employee.nickname || '-'}</TableCell>
+                    <TableCell>{employee.username}</TableCell>
+                    <TableCell>{employee.email}</TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={employee.role} 
+                        color={employee.role === 'Admin' ? 'primary' : 'default'}
+                        size="small"
+                      />
+                    </TableCell>
+                    <TableCell>{employee.contact || '-'}</TableCell>
+                    <TableCell align="center">
+                      <Switch
+                        checked={employee.isActive}
+                        onChange={() => handleToggleEmployeeStatus(employee.id, employee.isActive)}
+                        color="primary"
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      <IconButton
+                        size="small"
+                        color="primary"
+                        onClick={() => handleOpenEditEmployeeModal(employee)}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -295,7 +458,7 @@ export default function EmployeesPage() {
         fullWidth
       >
         <DialogTitle sx={{ m: 0, p: 2 }}>
-          Foto Karyawan
+          Foto Kehadiran
           <IconButton
             aria-label="close"
             onClick={handleClosePhotoModal}
@@ -310,25 +473,48 @@ export default function EmployeesPage() {
           </IconButton>
         </DialogTitle>
         <DialogContent dividers>
-          {selectedEmployee && (
+          {selectedPresence && (
             <Box sx={{ textAlign: "center" }}>
               <Typography variant="h6" gutterBottom>
-                {selectedEmployee.name}
+                User ID: {selectedPresence.userId}
               </Typography>
-              <Box
-                component="img"
-                src={`https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=face`}
-                alt={`Foto ${selectedEmployee.name}`}
-                sx={{
-                  width: 250,
-                  height: 250,
-                  borderRadius: 2,
-                  objectFit: "cover",
-                  border: "2px solid #e0e0e0",
-                }}
-              />
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Check-in: {formatDateTime(selectedPresence.checkInTime)}
+              </Typography>
+              {selectedPresence.imageUrl ? (
+                <Box
+                  component="img"
+                  src={selectedPresence.imageUrl}
+                  alt={`Foto kehadiran ${selectedPresence.userId}`}
+                  sx={{
+                    width: 250,
+                    height: 250,
+                    borderRadius: 2,
+                    objectFit: "cover",
+                    border: "2px solid #e0e0e0",
+                  }}
+                />
+              ) : (
+                <Box
+                  sx={{
+                    width: 250,
+                    height: 250,
+                    borderRadius: 2,
+                    border: "2px solid #e0e0e0",
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: '#f5f5f5',
+                    mx: 'auto'
+                  }}
+                >
+                  <Typography variant="body2" color="text.secondary">
+                    No image available
+                  </Typography>
+                </Box>
+              )}
               <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                {selectedEmployee.position}
+                Status: {selectedPresence.validated ? 'Validated' : 'Pending Validation'}
               </Typography>
             </Box>
           )}
@@ -372,7 +558,7 @@ export default function EmployeesPage() {
               required
             />
             <TextField
-              label="Panggilan"
+              label="Nickname"
               value={newEmployee.nickname}
               onChange={(e) =>
                 handleEmployeeInputChange("nickname", e.target.value)
@@ -388,22 +574,34 @@ export default function EmployeesPage() {
               fullWidth
               required
             />
-            <FormControl fullWidth required>
-              <InputLabel>Posisi</InputLabel>
-              <Select
-                value={newEmployee.position}
-                label="Posisi"
-                onChange={(e) =>
-                  handleEmployeeInputChange("position", e.target.value)
-                }
-              >
-                <MenuItem value="Manager">Manager</MenuItem>
-                <MenuItem value="Kasir">Kasir</MenuItem>
-                <MenuItem value="Barista">Barista</MenuItem>
-                <MenuItem value="Waiter">Waiter</MenuItem>
-                <MenuItem value="Cleaner">Cleaner</MenuItem>
-              </Select>
-            </FormControl>
+            <TextField
+              label="Email"
+              type="email"
+              value={newEmployee.email}
+              onChange={(e) =>
+                handleEmployeeInputChange("email", e.target.value)
+              }
+              fullWidth
+              required
+            />
+            <TextField
+              label="Password"
+              type="password"
+              value={newEmployee.password}
+              onChange={(e) =>
+                handleEmployeeInputChange("password", e.target.value)
+              }
+              fullWidth
+              required
+            />
+            <TextField
+              label="Contact (Optional)"
+              value={newEmployee.contact}
+              onChange={(e) =>
+                handleEmployeeInputChange("contact", e.target.value)
+              }
+              fullWidth
+            />
           </Box>
         </DialogContent>
         <DialogActions>
@@ -414,10 +612,99 @@ export default function EmployeesPage() {
             disabled={
               !newEmployee.name ||
               !newEmployee.username ||
-              !newEmployee.position
+              !newEmployee.email ||
+              !newEmployee.password ||
+              loading
             }
           >
-            Tambah Karyawan
+            {loading ? <CircularProgress size={20} /> : 'Tambah Karyawan'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Edit Employee Modal */}
+      <Dialog
+        open={editEmployeeModalOpen}
+        onClose={handleCloseEditEmployeeModal}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle sx={{ m: 0, p: 2 }}>
+          Edit Karyawan
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseEditEmployeeModal}
+            sx={{
+              position: "absolute",
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500],
+            }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent dividers>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}>
+            <TextField
+              label="Nama Lengkap"
+              value={editEmployee.name}
+              onChange={(e) =>
+                handleEditEmployeeInputChange("name", e.target.value)
+              }
+              fullWidth
+              required
+            />
+            <TextField
+              label="Nickname"
+              value={editEmployee.nickname}
+              onChange={(e) =>
+                handleEditEmployeeInputChange("nickname", e.target.value)
+              }
+              fullWidth
+            />
+            <TextField
+              label="Username"
+              value={editEmployee.username}
+              onChange={(e) =>
+                handleEditEmployeeInputChange("username", e.target.value)
+              }
+              fullWidth
+              required
+            />
+            <TextField
+              label="Email"
+              type="email"
+              value={editEmployee.email}
+              onChange={(e) =>
+                handleEditEmployeeInputChange("email", e.target.value)
+              }
+              fullWidth
+              required
+            />
+            <TextField
+              label="Contact"
+              value={editEmployee.contact}
+              onChange={(e) =>
+                handleEditEmployeeInputChange("contact", e.target.value)
+              }
+              fullWidth
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseEditEmployeeModal}>Batal</Button>
+          <Button
+            onClick={handleEditEmployee}
+            variant="contained"
+            disabled={
+              !editEmployee.name ||
+              !editEmployee.username ||
+              !editEmployee.email ||
+              loading
+            }
+          >
+            {loading ? <CircularProgress size={20} /> : 'Update Karyawan'}
           </Button>
         </DialogActions>
       </Dialog>

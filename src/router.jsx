@@ -26,6 +26,7 @@ import TransactionDetailPage from "./pages/TransactionDetailPage";
 import LoginPage from "./pages/LoginPage";
 import PhotoVerificationPage from "./pages/PhotoVerificationPage";
 import ReconciliationPage from "./pages/ReconciliationPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 import useAuthStore from "./stores/authStore";
 import { getCurrentUser } from "./utils/api";
@@ -113,7 +114,9 @@ function AuthLayout() {
 }
 
 // Create root route and route tree using code-based routing
-const rootRoute = createRootRoute();
+const rootRoute = createRootRoute({
+  notFoundComponent: NotFoundPage,
+});
 
 const rootLayoutRoute = createRoute({
   getParentRoute: () => rootRoute,

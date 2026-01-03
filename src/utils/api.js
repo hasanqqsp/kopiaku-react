@@ -1,6 +1,7 @@
 import axios from "axios";
 
-axios.defaults.baseURL = "http://localhost:5031/graphql";
+axios.defaults.baseURL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5031/graphql";
 
 const axiosWithAuth = axios.create();
 axiosWithAuth.interceptors.request.use((config) => {
@@ -180,6 +181,7 @@ export async function fetchUsers({ first = 10, after = null } = {}) {
           id
           name
           username
+          nickname
           email
           role
           contact
@@ -208,6 +210,7 @@ export async function addEmployees({
   email,
   password,
   contact = null,
+  nickname = null,
 }) {
   const mutation = `
     mutation Register($input: RegisterInput!) {
@@ -215,6 +218,7 @@ export async function addEmployees({
         id
         name
         username
+        nickname
         email
         role
         contact
@@ -230,6 +234,7 @@ export async function addEmployees({
     email,
     password,
     contact,
+    nickname,
   };
 
   try {
@@ -266,6 +271,31 @@ export async function deleteUser({ userId }) {
   }
 
   return res.data.data.deleteUser; // Boolean: true / false
+}
+
+export async function setUserActiveStatus({ userId, isActive }) {
+  const mutation = `
+    mutation SetUserActiveStatus($userId: String!, $isActive: Boolean!) {
+      setUserActiveStatus(userId: $userId, isActive: $isActive) {
+        id
+        name
+        nickname
+        username
+        isActive
+      }
+    }
+  `;
+
+  const res = await axiosWithAuth.post("", {
+    query: mutation,
+    variables: { userId, isActive },
+  });
+
+  if (res.data.errors) {
+    throw new Error(res.data.errors[0].message);
+  }
+
+  return res.data.data.setUserActiveStatus;
 }
 
 // export const updateUserProfile = async ({
@@ -397,7 +427,7 @@ export const updateUserProfile = async ({ userId, input, file }) => {
     return res.data.data.updateUserProfile;
   }
   const query = `
-    mutation UpdateUserProfile($userId: String!, $input: RegisterInput!) {
+    mutation UpdateUserProfile($userId: String!, $input: UpdateUserProfileInput!) {
       updateUserProfile(
         userId: $userId,
         input: $input
@@ -1237,4 +1267,475 @@ export async function reconcileTransactionsAPI(reconciliationData) {
   });
 
   return response.data.data.reconcileTransactions;
+}
+
+export async function getActiveHeroContent() {
+  const query = `
+    query GetActiveHeroContent {
+      activeHeroContent {
+        id
+        title
+        description
+        backgroundImageUrl
+        createdAt
+        updatedAt
+      }
+    }
+  `;
+  try {
+    const response = await axiosWithAuth.post("", {
+      query,
+      variables: {},
+    });
+    if (response.data.errors) {
+      throw new Error(response.data.errors[0].message);
+    }
+    return response.data.data.activeHeroContent;
+  } catch (err) {
+    console.error("getActiveHeroContent error:", err);
+    throw err;
+  }
+}
+export function createFormDataForFileUpload(query, variables) {
+  const formData = new FormData();
+
+  // Extract files from variables
+  const files = {};
+  let fileIndex = 0;
+
+  const processedVariables = JSON.parse(
+    JSON.stringify(variables, (key, value) => {
+      if (value instanceof File) {
+        const fileKey = fileIndex.toString();
+        files[fileKey] = {
+          file: value,
+          path: `variables.input.${key}`,
+        };
+        fileIndex++;
+        return null; // Replace file with null in variables
+      }
+      return value;
+    })
+  );
+
+  // Add the operations (query + variables)
+  const operations = {
+    query,
+    variables: processedVariables,
+  };
+  formData.append("operations", JSON.stringify(operations));
+
+  // Add the map
+  const map = {};
+  Object.keys(files).forEach((fileKey) => {
+    map[fileKey] = [files[fileKey].path];
+  });
+  formData.append("map", JSON.stringify(map));
+
+  // Add the files
+  Object.keys(files).forEach((fileKey) => {
+    formData.append(fileKey, files[fileKey].file);
+  });
+
+  return formData;
+}
+
+export async function uploadWithFile(mutation, variables) {
+  try {
+    const formData = createFormDataForFileUpload(mutation, variables);
+
+    const response = await axiosWithAuth.post("", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        "GraphQL-Preflight": 1,
+      },
+    });
+
+    if (response.data.errors) {
+      throw new Error(response.data.errors[0].message);
+    }
+
+    // Return the first mutation result (assuming single mutation)
+    const mutationName = Object.keys(response.data.data)[0];
+    return response.data.data[mutationName];
+  } catch (err) {
+    console.error("uploadWithFile error:", err);
+    throw err;
+  }
+}
+export async function updateOrCreateHeroContent(input) {
+  const mutation = `
+    mutation UpdateOrCreateHeroContent($input: UpdateHeroContentInput!, $backgroundImage: Upload) {
+      updateOrCreateHeroContent(input: $input, backgroundImage: $backgroundImage) {
+        id
+        title
+        description
+        backgroundImageUrl
+        createdAt
+        updatedAt
+      }
+    }
+  `;
+
+  // Check if there's a file in the input
+  const hasFile = input.backgroundImage instanceof File;
+
+  if (hasFile) {
+    // Extract the file and remove it from input
+    const backgroundImageFile = input.backgroundImage;
+    const inputWithoutFile = { ...input };
+    delete inputWithoutFile.backgroundImage;
+
+    // Use the utility function for file upload with separate file parameter
+    return await uploadWithFile(mutation, {
+      input: inputWithoutFile,
+      backgroundImage: backgroundImageFile,
+    });
+  } else {
+    // Regular GraphQL request without files
+    const inputWithoutFile = { ...input };
+    delete inputWithoutFile.backgroundImage;
+
+    try {
+      const response = await axiosWithAuth.post("", {
+        query: mutation,
+        variables: {
+          input: inputWithoutFile,
+          backgroundImage: null,
+        },
+      });
+      if (response.data.errors) {
+        throw new Error(response.data.errors[0].message);
+      }
+      return response.data.data.updateOrCreateHeroContent;
+    } catch (err) {
+      console.error("updateOrCreateHeroContent error:", err);
+      throw err;
+    }
+  }
+}
+
+export async function updateOrCreateHeroContentWithImage(
+  input,
+  backgroundImageFile
+) {
+  try {
+    // Use FormData for file upload
+    const formData = new FormData();
+
+    const operations = JSON.stringify({
+      query: `
+        mutation UpdateOrCreateHeroContent($input: UpdateHeroContentInput!, $backgroundImage: Upload) {
+          updateOrCreateHeroContent(input: $input, backgroundImage: $backgroundImage) {
+            id
+            title
+            description
+            backgroundImageUrl
+            createdAt
+            updatedAt
+          }
+        }
+      `,
+      variables: {
+        input: {
+          title: input.title,
+          description: input.description,
+        },
+        backgroundImage: null,
+      },
+    });
+
+    const map = JSON.stringify({
+      0: ["variables.backgroundImage"],
+    });
+
+    formData.append("operations", operations);
+    formData.append("map", map);
+    formData.append("0", backgroundImageFile);
+
+    const response = await axiosWithAuth.post("/", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        "GraphQL-Preflight": 1,
+      },
+    });
+
+    if (response.data.errors) {
+      throw new Error(response.data.errors[0].message);
+    }
+    return response.data.data.updateOrCreateHeroContent;
+  } catch (err) {
+    console.error("updateOrCreateHeroContentWithImage error:", err);
+    throw err;
+  }
+}
+
+export async function getActiveAboutUsContent() {
+  const query = `
+    query GetActiveAboutUsContent {
+      activeAboutUsContent {
+        id
+        paragraph1
+        paragraph2
+        vision
+        mission
+        background
+        createdAt
+        updatedAt
+      }
+    }
+  `;
+  try {
+    const response = await axiosWithAuth.post("", {
+      query,
+      variables: {},
+    });
+    if (response.data.errors) {
+      throw new Error(response.data.errors[0].message);
+    }
+    return response.data.data.activeAboutUsContent;
+  } catch (err) {
+    console.error("getActiveAboutUsContent error:", err);
+    throw err;
+  }
+}
+
+export async function updateOrCreateAboutUsContent(input) {
+  const mutation = `
+    mutation UpdateOrCreateAboutUsContent($input: UpdateAboutUsContentInput!) {
+      updateOrCreateAboutUsContent(input: $input) {
+        id
+        paragraph1
+        paragraph2
+        vision
+        mission
+        background
+        createdAt
+        updatedAt
+      }
+    }
+  `;
+  try {
+    const response = await axiosWithAuth.post("", {
+      query: mutation,
+      variables: {
+        input,
+      },
+    });
+    if (response.data.errors) {
+      throw new Error(response.data.errors[0].message);
+    }
+    return response.data.data.updateOrCreateAboutUsContent;
+  } catch (err) {
+    console.error("updateOrCreateAboutUsContent error:", err);
+    throw err;
+  }
+}
+
+export async function getActivePromotionContent() {
+  const query = `
+    query GetActivePromotionContent {
+      activePromotionContent {
+        id
+        title
+        rules
+        createdAt
+        updatedAt
+      }
+    }
+  `;
+  try {
+    const response = await axiosWithAuth.post("", {
+      query,
+      variables: {},
+    });
+    if (response.data.errors) {
+      throw new Error(response.data.errors[0].message);
+    }
+    return response.data.data.activePromotionContent;
+  } catch (err) {
+    console.error("getActivePromotionContent error:", err);
+    throw err;
+  }
+}
+
+export async function updateOrCreatePromotionContent(input) {
+  const mutation = `
+    mutation UpdateOrCreatePromotionContent($input: UpdatePromotionContentInput!) {
+      updateOrCreatePromotionContent(input: $input) {
+        id
+        title
+        rules
+        createdAt
+        updatedAt
+      }
+    }
+  `;
+  try {
+    const response = await axiosWithAuth.post("", {
+      query: mutation,
+      variables: {
+        input,
+      },
+    });
+    if (response.data.errors) {
+      throw new Error(response.data.errors[0].message);
+    }
+    return response.data.data.updateOrCreatePromotionContent;
+  } catch (err) {
+    console.error("updateOrCreatePromotionContent error:", err);
+    throw err;
+  }
+}
+
+export async function getAllCarouselContents() {
+  const query = `
+    query GetAllCarouselContents {
+      allCarouselContents {
+        id
+        altText
+        imageUrl
+        createdAt
+        updatedAt
+      }
+    }
+  `;
+  try {
+    const response = await axiosWithAuth.post("", {
+      query,
+      variables: {},
+    });
+    if (response.data.errors) {
+      throw new Error(response.data.errors[0].message);
+    }
+    return response.data.data.allCarouselContents;
+  } catch (err) {
+    console.error("getAllCarouselContents error:", err);
+    throw err;
+  }
+}
+
+export async function addCarouselContent(altText, image) {
+  const mutation = `
+    mutation AddCarouselContent($input: CarouselContentInput!) {
+      addCarouselContent(input: $input) {
+        id
+        altText
+        imageUrl
+        createdAt
+        updatedAt
+      }
+    }
+  `;
+
+  const input = {
+    altText,
+    image,
+  };
+
+  // Check if there's a file in the input
+  const hasFile = image instanceof File;
+
+  if (hasFile) {
+    // Use the utility function for file upload
+    return await uploadWithFile(mutation, { input });
+  } else {
+    // Regular GraphQL request without files
+    try {
+      const response = await axiosWithAuth.post("", {
+        query: mutation,
+        variables: { input },
+      });
+      if (response.data.errors) {
+        throw new Error(response.data.errors[0].message);
+      }
+      return response.data.data.addCarouselContent;
+    } catch (err) {
+      console.error("addCarouselContent error:", err);
+      throw err;
+    }
+  }
+}
+
+export async function deleteCarouselContent(id) {
+  const mutation = `
+    mutation DeleteCarouselContent($id: String!) {
+      deleteCarouselContent(id: $id)
+    }
+  `;
+  try {
+    const response = await axiosWithAuth.post("", {
+      query: mutation,
+      variables: { id },
+    });
+    if (response.data.errors) {
+      throw new Error(response.data.errors[0].message);
+    }
+    return response.data.data.deleteCarouselContent;
+  } catch (err) {
+    console.error("deleteCarouselContent error:", err);
+    throw err;
+  }
+}
+
+export async function getActiveContactContent() {
+  const query = `
+    query GetActiveContactContent {
+      activeContactContent {
+        id
+        operationalHours
+        address
+        whatsapp
+        instagram
+        googleMaps
+        createdAt
+        updatedAt
+      }
+    }
+  `;
+  try {
+    const response = await axiosWithAuth.post("", {
+      query,
+      variables: {},
+    });
+    if (response.data.errors) {
+      throw new Error(response.data.errors[0].message);
+    }
+    return response.data.data.activeContactContent;
+  } catch (err) {
+    console.error("getActiveContactContent error:", err);
+    throw err;
+  }
+}
+
+export async function updateOrCreateContactContent(input) {
+  const mutation = `
+    mutation UpdateOrCreateContactContent($input: UpdateContactContentInput!) {
+      updateOrCreateContactContent(input: $input) {
+        id
+        operationalHours
+        address
+        whatsapp
+        instagram
+        googleMaps
+        createdAt
+        updatedAt
+      }
+    }
+  `;
+  try {
+    const response = await axiosWithAuth.post("", {
+      query: mutation,
+      variables: {
+        input,
+      },
+    });
+    if (response.data.errors) {
+      throw new Error(response.data.errors[0].message);
+    }
+    return response.data.data.updateOrCreateContactContent;
+  } catch (err) {
+    console.error("updateOrCreateContactContent error:", err);
+    throw err;
+  }
 }

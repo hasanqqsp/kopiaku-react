@@ -147,7 +147,7 @@ export default function TransactionsPage() {
   return (
     <Box>
       <Typography variant="h4" gutterBottom>
-        Transactions
+        Transaksi
       </Typography>
 
       <TableContainer component={Paper}>
