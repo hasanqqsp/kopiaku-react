@@ -1,6 +1,7 @@
 // API functions for static landing page
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5031/graphql";
+  import.meta.env.VITE_API_BASE_URL ||
+  "http://kopiaku-newapi.test.h14.my.id/graphql";
 
 // Create axios-like function for GraphQL requests
 async function graphqlRequest(query, variables = {}) {

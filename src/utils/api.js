@@ -34,7 +34,8 @@ axiosWithAuth.interceptors.request.use((config) => {
 //   (error) => Promise.reject(error)
 // );
 
-axiosWithAuth.defaults.baseURL = "http://localhost:5031/graphql";
+axiosWithAuth.defaults.baseURL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5031/graphql";
 
 export async function login(email, password) {
   const query = `
