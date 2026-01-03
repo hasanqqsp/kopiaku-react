@@ -13,6 +13,7 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:5031/graphql}
     command: pnpm run dev --host 0.0.0.0
     profiles:
       - dev
@@ -22,6 +23,8 @@ services:
     build:
       context: .
       target: production
+      args:
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:5031/graphql}
     ports:
       - "80:80"
     environment:
@@ -34,6 +37,8 @@ services:
     build:
       context: .
       target: build
+      args:
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:5031/graphql}
     volumes:
       - ./dist:/app/dist
     profiles:

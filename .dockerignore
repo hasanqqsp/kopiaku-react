@@ -29,11 +29,8 @@ Dockerfile*
 docker-compose*
 .dockerignore
 
-# Environment files (adjust as needed)
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+# Environment files (not needed - using system env vars)
+.env*
 
 # Logs
 logs

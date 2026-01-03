@@ -19,6 +19,13 @@ COPY . .
 # Build stage
 FROM base AS build
 
+# Accept build-time environment variables
+ARG VITE_API_BASE_URL
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+
+ARG VITE_STATIC_QRIS_DATA
+ENV VITE_STATIC_QRIS_DATA=$VITE_STATIC_QRIS_DATA
+
 # Build the application
 RUN pnpm run build
 
@@ -55,4 +62,3 @@ EXPOSE 80
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]
-

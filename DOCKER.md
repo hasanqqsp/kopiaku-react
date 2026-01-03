@@ -41,18 +41,24 @@ docker-compose --profile build up
 # Build development image
 docker build --target development -t kopiaku-react:dev .
 
-# Build production image
-docker build --target production -t kopiaku-react:prod .
+# Build production image with build args
+docker build --target production --build-arg VITE_API_BASE_URL=http://localhost:5031/graphql -t kopiaku-react:prod .
 ```
 
 ### Run Containers
 
 ```bash
-# Development (with hot reload)
-docker run -p 5173:5173 -v $(pwd):/app -v /app/node_modules kopiaku-react:dev
+# Development (with environment variables)
+docker run -p 5173:5173 -v $(pwd):/app -v /app/node_modules \
+  -e VITE_API_BASE_URL=http://localhost:5031/graphql \
+  kopiaku-react:dev
 
-# Production
+# Production (environment variables baked into build)
 docker run -p 80:80 kopiaku-react:prod
+
+# Alternative: Export env vars first
+export VITE_API_BASE_URL=http://localhost:5031/graphql
+docker run -p 5173:5173 -e VITE_API_BASE_URL kopiaku-react:dev
 ```
 
 ### Clean Up
@@ -70,11 +76,30 @@ docker system prune -a
 
 ## Environment Variables
 
-Create a `.env` file in the project root:
+**System Environment Variables**: This setup uses environment variables from the system rather than `.env` files.
+
+### Set Environment Variables
 
 ```bash
-VITE_API_BASE_URL=http://localhost:5031/graphql
+# Export environment variables in your shell
+export VITE_API_BASE_URL=http://localhost:5031/graphql
+
+# Or use a .env file for docker-compose (optional)
+echo "VITE_API_BASE_URL=http://localhost:5031/graphql" > .env
 ```
+
+### How Environment Variables Work
+
+- **Development**: Environment variables are passed directly to the container at runtime
+- **Build**: Build arguments (`ARG`) are used to pass variables during image build
+- **Production**: Environment variables are baked into the static files during build
+
+### Environment Variable Sources
+
+1. **System environment**: `export VITE_API_BASE_URL=...`
+2. **Docker Compose**: Set in `docker-compose.yml` environment section
+3. **Docker run**: `docker run -e VITE_API_BASE_URL=...`
+4. **Build args**: Passed during `docker build --build-arg VITE_API_BASE_URL=...`
 
 ## Nginx Configuration
 
