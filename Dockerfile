@@ -56,11 +56,3 @@ EXPOSE 80
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]
 
-# Development stage (optional)
-FROM base AS development
-
-# Expose Vite dev server port
-EXPOSE 5173
-
-# Start development server
-CMD ["pnpm", "run", "dev", "--host", "0.0.0.0"]
