@@ -1,5 +1,3 @@
-import { loadContentData } from "./api";
-
 // Content population script for static landing page
 document.addEventListener("DOMContentLoaded", async function () {
   console.log("Loading dynamic content...");

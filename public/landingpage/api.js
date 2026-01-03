@@ -182,7 +182,7 @@ async function getMenus() {
 }
 
 // Main function to load all content
-export async function loadContentData() {
+async function loadContentData() {
   console.log("Loading content from API...");
 
   try {
