@@ -59,7 +59,7 @@ export default function PhotoVerificationPage() {
     } catch (err) {
       console.error("Error accessing camera:", err);
       setError(
-        "Tidak dapat mengakses kamera. Pastikan Anda memberikan izin kamera dan menggunakan browser yang mendukung."
+        "Tidak dapat mengakses kamera. Pastikan Anda memberikan izin kamera dan menggunakan browser yang mendukung.",
       );
     } finally {
       setIsLoading(false);
@@ -94,12 +94,12 @@ export default function PhotoVerificationPage() {
         const photoUrl = URL.createObjectURL(blob);
         setCapturedPhoto(photoUrl);
         setCapturedPhotoFile(
-          new File([blob], "photo.jpg", { type: "image/jpeg" })
+          new File([blob], "photo.jpg", { type: "image/jpeg" }),
         );
         stopCamera(); // Stop camera after capture
       },
       "image/jpeg",
-      0.8
+      0.8,
     );
   };
 
@@ -118,6 +118,9 @@ export default function PhotoVerificationPage() {
     try {
       // Simulate API call to submit photo
       await checkIn({ file: capturedPhotoFile });
+
+      // Close camera
+      stopCamera();
 
       // Navigate back to attendance page or dashboard
       navigate({ to: "/employees" });

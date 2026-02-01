@@ -11,6 +11,7 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import Chip from "@mui/material/Chip";
 import CircularProgress from "@mui/material/CircularProgress";
+import TablePagination from "@mui/material/TablePagination";
 import { getTransactionsAPI, getTransactionsByUserIdAPI } from "../utils/api";
 import useAuthStore from "../stores/authStore";
 // using plain MUI table with local sort — removed tanstack dependency for compatibility
@@ -33,20 +34,41 @@ function formatDateTime(iso) {
 export default function TransactionsPage() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [sorting, setSorting] = useState([]);
+  const [sorting, setSorting] = useState({ id: null, desc: false });
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalCount, setTotalCount] = useState(0);
   const navigate = useNavigate();
   const { user } = useAuthStore();
 
+  const toggleSort = (id) => {
+    setSorting((prev) => {
+      if (prev.id === id) {
+        return { ...prev, desc: !prev.desc };
+      } else {
+        return { id, desc: false };
+      }
+    });
+  };
+
   useEffect(() => {
     const fetchTransactions = async () => {
+      setLoading(true);
       try {
         let result;
         if (user?.role === "Admin") {
-          result = await getTransactionsAPI();
+          result = await getTransactionsAPI({
+            take: pageSize,
+            skip: page * pageSize,
+          });
         } else {
-          result = await getTransactionsByUserIdAPI(user?.id);
+          result = await getTransactionsByUserIdAPI(user?.id, {
+            take: pageSize,
+            skip: page * pageSize,
+          });
         }
-        setData(result.nodes || []);
+        setData(result.items || []);
+        setTotalCount(result.totalCount || 0);
       } catch (error) {
         console.error("Error fetching transactions:", error);
       } finally {
@@ -57,7 +79,7 @@ export default function TransactionsPage() {
     if (user) {
       fetchTransactions();
     }
-  }, [user]);
+  }, [user, page, pageSize]);
 
   const columns = useMemo(
     () => [
@@ -119,7 +141,7 @@ export default function TransactionsPage() {
             : "-",
       },
     ],
-    []
+    [],
   );
 
   const sortedData = useMemo(() => {
@@ -139,9 +161,13 @@ export default function TransactionsPage() {
     });
   }, [data, sorting, columns]);
 
-  const toggleSort = (colId) => {
-    if (sorting?.id !== colId) setSorting({ id: colId, desc: false });
-    else setSorting({ id: colId, desc: !sorting.desc });
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangePageSize = (event) => {
+    setPageSize(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   return (
@@ -201,6 +227,20 @@ export default function TransactionsPage() {
           </TableBody>
         </Table>
       </TableContainer>
+
+      <TablePagination
+        component="div"
+        count={totalCount}
+        page={page}
+        onPageChange={handleChangePage}
+        rowsPerPage={pageSize}
+        onRowsPerPageChange={handleChangePageSize}
+        rowsPerPageOptions={[5, 10, 25, 50]}
+        labelRowsPerPage="Baris per halaman:"
+        labelDisplayedRows={({ from, to, count }) =>
+          `${from}-${to} dari ${count !== -1 ? count : `lebih dari ${to}`}`
+        }
+      />
     </Box>
   );
 }

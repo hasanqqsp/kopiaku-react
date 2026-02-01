@@ -26,6 +26,7 @@ import TransactionDetailPage from "./pages/TransactionDetailPage";
 import LoginPage from "./pages/LoginPage";
 import PhotoVerificationPage from "./pages/PhotoVerificationPage";
 import ReconciliationPage from "./pages/ReconciliationPage";
+import AccountPage from "./pages/AccountPage";
 import NotFoundPage from "./pages/NotFoundPage";
 
 import useAuthStore from "./stores/authStore";
@@ -45,16 +46,24 @@ const requireAuth = async () => {
       search: {},
     });
   }
-  const user = await getCurrentUser();
-  if (!user) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      throw redirect({
+        to: "/login",
+        search: {},
+      });
+    }
+    if (user?.role !== "Admin" && !hasPresence(user)) {
+      throw redirect({
+        to: "/photo-verification",
+        search: {},
+      });
+    }
+  } catch {
+    // If getCurrentUser fails, redirect to login
     throw redirect({
       to: "/login",
-      search: {},
-    });
-  }
-  if (user?.role !== "Admin" && !hasPresence(user)) {
-    throw redirect({
-      to: "/photo-verification",
       search: {},
     });
   }
@@ -198,21 +207,42 @@ const photoVerificationRoute = createRoute({
   path: "photo-verification",
   component: PhotoVerificationPage,
   beforeLoad: async () => {
-    const user = await getCurrentUser();
-    requireAuth();
-    if (user?.role === "Admin") {
+    try {
+      const user = await getCurrentUser();
+      if (!user) {
+        throw redirect({
+          to: "/login",
+          search: {},
+        });
+      }
+      // await requireAuth();
+      if (user?.role === "Admin") {
+        throw redirect({
+          to: "/",
+          search: {},
+        });
+      }
+      if (user?.presence) {
+        throw redirect({
+          to: "/",
+          search: {},
+        });
+      }
+    } catch {
+      console.log("Error fetching user");
+      // If error occurs (e.g., not logged in), allow access to this page
       throw redirect({
-        to: "/",
-        search: {},
-      });
-    }
-    if (user?.presence) {
-      throw redirect({
-        to: "/",
+        to: "/login",
         search: {},
       });
     }
   },
+});
+const accountRoute = createRoute({
+  getParentRoute: () => rootLayoutRoute,
+  path: "account",
+  component: AccountPage,
+  beforeLoad: requireAuth,
 });
 const contentRoute = createRoute({
   getParentRoute: () => rootLayoutRoute,
@@ -254,7 +284,11 @@ const routeTree = rootRoute.addChildren([
     transactionsRoute,
     reconciliationRoute,
   ]),
-  authLayoutRoute.addChildren([loginRoute, photoVerificationRoute]),
+  authLayoutRoute.addChildren([
+    loginRoute,
+    photoVerificationRoute,
+    accountRoute,
+  ]),
 ]);
 
 const router = createRouter({ routeTree });

@@ -29,13 +29,13 @@ import EditIcon from "@mui/icons-material/Edit";
 import CircularProgress from "@mui/material/CircularProgress";
 import Alert from "@mui/material/Alert";
 import CheckIcon from "@mui/icons-material/Check";
-import { 
-  fetchUsers, 
-  fetchPresences, 
-  addEmployees, 
+import {
+  fetchUsers,
+  fetchPresences,
+  addEmployees,
   validatePresence,
   setUserActiveStatus,
-  updateUserProfile 
+  updateUserProfile,
 } from "../utils/api";
 
 const getAttendanceStatusColor = (status) => {
@@ -43,7 +43,7 @@ const getAttendanceStatusColor = (status) => {
     case "Present":
       return "success";
     case "Working":
-      return "primary";  
+      return "primary";
     case "Absent":
       return "error";
     default:
@@ -53,12 +53,12 @@ const getAttendanceStatusColor = (status) => {
 
 const formatDateTime = (dateString) => {
   if (!dateString) return "-";
-  return new Date(dateString).toLocaleString('id-ID', {
-    year: 'numeric',
-    month: '2-digit', 
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
+  return new Date(dateString).toLocaleString("id-ID", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 };
 
@@ -91,7 +91,7 @@ export default function EmployeesPage() {
     contact: "",
     nickname: "",
   });
-  
+
   // Data states
   const [employees, setEmployees] = useState([]);
   const [presences, setPresences] = useState([]);
@@ -108,17 +108,17 @@ export default function EmployeesPage() {
     try {
       setLoading(true);
       setError(null);
-      
+
       const [employeesData, presencesData] = await Promise.all([
         fetchUsers({ first: 1000 }),
-        fetchPresences({ first: 1000 })
+        fetchPresences({ first: 1000 }),
       ]);
-      
+
       setEmployees(employeesData.nodes || []);
       setPresences(presencesData.nodes || []);
     } catch (err) {
       setError(`Failed to load data: ${err.message}`);
-      console.error('Error loading employee data:', err);
+      console.error("Error loading employee data:", err);
     } finally {
       setLoading(false);
     }
@@ -189,13 +189,13 @@ export default function EmployeesPage() {
         contact: newEmployee.contact || null,
         nickname: newEmployee.nickname || null,
       });
-      
+
       // Refresh the employees list
       await loadData();
       handleCloseAddEmployeeModal();
     } catch (err) {
       setError(`Failed to add employee: ${err.message}`);
-      console.error('Error adding employee:', err);
+      console.error("Error adding employee:", err);
     } finally {
       setLoading(false);
     }
@@ -228,13 +228,13 @@ export default function EmployeesPage() {
           nickname: editEmployee.nickname || null,
         },
       });
-      
+
       // Refresh the employees list
       await loadData();
       handleCloseEditEmployeeModal();
     } catch (err) {
       setError(`Failed to update employee: ${err.message}`);
-      console.error('Error updating employee:', err);
+      console.error("Error updating employee:", err);
     } finally {
       setLoading(false);
     }
@@ -244,12 +244,12 @@ export default function EmployeesPage() {
     try {
       setValidatingPresence(presenceId);
       await validatePresence(presenceId);
-      
+
       // Refresh the presences list
       await loadData();
     } catch (err) {
       setError(`Failed to validate presence: ${err.message}`);
-      console.error('Error validating presence:', err);
+      console.error("Error validating presence:", err);
     } finally {
       setValidatingPresence(null);
     }
@@ -257,12 +257,12 @@ export default function EmployeesPage() {
 
   const handleToggleEmployeeStatus = async (userId, currentStatus) => {
     const newStatus = !currentStatus;
-    const actionText = newStatus ? 'activate' : 'deactivate';
-    
+    const actionText = newStatus ? "activate" : "deactivate";
+
     try {
       setLoading(true);
       await setUserActiveStatus({ userId, isActive: newStatus });
-      
+
       // Refresh the employees list
       await loadData();
     } catch (err) {
@@ -275,7 +275,7 @@ export default function EmployeesPage() {
 
   if (loading) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+      <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
         <CircularProgress />
       </Box>
     );
@@ -315,7 +315,7 @@ export default function EmployeesPage() {
             <Table size="small">
               <TableHead>
                 <TableRow>
-                  <TableCell>User ID</TableCell>
+                  <TableCell>Nama Karyawan</TableCell>
                   <TableCell>Waktu Masuk</TableCell>
                   <TableCell>Waktu Keluar</TableCell>
                   <TableCell>Status</TableCell>
@@ -328,9 +328,13 @@ export default function EmployeesPage() {
                   const status = getPresenceStatus(presence);
                   return (
                     <TableRow key={presence.id}>
-                      <TableCell>{presence.userId}</TableCell>
-                      <TableCell>{formatDateTime(presence.checkInTime)}</TableCell>
-                      <TableCell>{formatDateTime(presence.checkOutTime)}</TableCell>
+                      <TableCell>{presence.user.name}</TableCell>
+                      <TableCell>
+                        {formatDateTime(presence.checkInTime)}
+                      </TableCell>
+                      <TableCell>
+                        {formatDateTime(presence.checkOutTime)}
+                      </TableCell>
                       <TableCell>
                         <Chip
                           label={status}
@@ -359,7 +363,13 @@ export default function EmployeesPage() {
                             variant="contained"
                             size="small"
                             color="success"
-                            startIcon={validatingPresence === presence.id ? <CircularProgress size={16} /> : <CheckIcon />}
+                            startIcon={
+                              validatingPresence === presence.id ? (
+                                <CircularProgress size={16} />
+                              ) : (
+                                <CheckIcon />
+                              )
+                            }
                             onClick={() => handleValidatePresence(presence.id)}
                             disabled={validatingPresence === presence.id}
                           >
@@ -415,21 +425,28 @@ export default function EmployeesPage() {
                 {employees.map((employee) => (
                   <TableRow key={employee.id}>
                     <TableCell>{employee.name}</TableCell>
-                    <TableCell>{employee.nickname || '-'}</TableCell>
+                    <TableCell>{employee.nickname || "-"}</TableCell>
                     <TableCell>{employee.username}</TableCell>
                     <TableCell>{employee.email}</TableCell>
                     <TableCell>
-                      <Chip 
-                        label={employee.role} 
-                        color={employee.role === 'Admin' ? 'primary' : 'default'}
+                      <Chip
+                        label={employee.role}
+                        color={
+                          employee.role === "Admin" ? "primary" : "default"
+                        }
                         size="small"
                       />
                     </TableCell>
-                    <TableCell>{employee.contact || '-'}</TableCell>
+                    <TableCell>{employee.contact || "-"}</TableCell>
                     <TableCell align="center">
                       <Switch
                         checked={employee.isActive}
-                        onChange={() => handleToggleEmployeeStatus(employee.id, employee.isActive)}
+                        onChange={() =>
+                          handleToggleEmployeeStatus(
+                            employee.id,
+                            employee.isActive,
+                          )
+                        }
                         color="primary"
                       />
                     </TableCell>
@@ -501,11 +518,11 @@ export default function EmployeesPage() {
                     height: 250,
                     borderRadius: 2,
                     border: "2px solid #e0e0e0",
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: '#f5f5f5',
-                    mx: 'auto'
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: "#f5f5f5",
+                    mx: "auto",
                   }}
                 >
                   <Typography variant="body2" color="text.secondary">
@@ -514,7 +531,10 @@ export default function EmployeesPage() {
                 </Box>
               )}
               <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
-                Status: {selectedPresence.validated ? 'Validated' : 'Pending Validation'}
+                Status:{" "}
+                {selectedPresence.validated
+                  ? "Validated"
+                  : "Pending Validation"}
               </Typography>
             </Box>
           )}
@@ -617,7 +637,7 @@ export default function EmployeesPage() {
               loading
             }
           >
-            {loading ? <CircularProgress size={20} /> : 'Tambah Karyawan'}
+            {loading ? <CircularProgress size={20} /> : "Tambah Karyawan"}
           </Button>
         </DialogActions>
       </Dialog>
@@ -704,7 +724,7 @@ export default function EmployeesPage() {
               loading
             }
           >
-            {loading ? <CircularProgress size={20} /> : 'Update Karyawan'}
+            {loading ? <CircularProgress size={20} /> : "Update Karyawan"}
           </Button>
         </DialogActions>
       </Dialog>

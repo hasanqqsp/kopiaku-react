@@ -23,6 +23,7 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import Button from "@mui/material/Button";
 import LogoutIcon from "@mui/icons-material/Logout";
 import CompareIcon from "@mui/icons-material/Compare";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -108,7 +109,11 @@ export default function Sidebar({ onSelect, open = true, setOpen }) {
   };
 
   const onLogout = () => {
-    setLogoutDialogOpen(true);
+    if (user?.role === "Admin") {
+      handleLogoutOnly();
+    } else {
+      setLogoutDialogOpen(true);
+    }
   };
 
   const handleEndShift = async () => {
@@ -144,16 +149,16 @@ export default function Sidebar({ onSelect, open = true, setOpen }) {
       const found = filteredMenuItems.find(
         (m) =>
           m.path &&
-          (m.path === path || (m.path !== "/" && path.startsWith(m.path)))
+          (m.path === path || (m.path !== "/" && path.startsWith(m.path))),
       );
       return found ? found.id : "dashboard";
     },
-    [filteredMenuItems]
+    [filteredMenuItems],
   );
   const [selected, setSelected] = React.useState(() =>
     getSelectedFromPath(
-      typeof window !== "undefined" ? window.location.pathname : "/"
-    )
+      typeof window !== "undefined" ? window.location.pathname : "/",
+    ),
   );
 
   React.useEffect(() => {
@@ -167,8 +172,8 @@ export default function Sidebar({ onSelect, open = true, setOpen }) {
   const paperWidth = isMobile
     ? drawerWidth
     : open
-    ? drawerWidth
-    : collapsedWidth;
+      ? drawerWidth
+      : collapsedWidth;
 
   const drawerSx = {
     width: paperWidth,
@@ -316,6 +321,21 @@ export default function Sidebar({ onSelect, open = true, setOpen }) {
           </Box>
 
           <Box sx={{ display: open ? "block" : "none" }}>
+            <Button
+              onClick={() => navigate({ to: "/account" })}
+              variant="outlined"
+              size="small"
+              startIcon={<AccountCircleIcon />}
+              fullWidth
+              sx={{
+                color: primaryContrast,
+                borderColor: alpha(primaryContrast, 0.12),
+                textTransform: "none",
+                mb: 1,
+              }}
+            >
+              Akun
+            </Button>
             <Button
               onClick={onLogout}
               variant="outlined"
