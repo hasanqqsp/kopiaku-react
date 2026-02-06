@@ -43,7 +43,7 @@ export default function CashierPage() {
         setLoading(true);
         const response = await getMenusWithDetails(); // Fetch more items
         const availableMenus = response.nodes.filter(
-          (menu) => menu.isAvailable
+          (menu) => menu.isAvailable,
         );
         setProducts(availableMenus);
         setError(null);
@@ -189,7 +189,6 @@ export default function CashierPage() {
                 cartItems={cartItems}
                 total={total}
                 onUpdateQuantity={setQty}
-                onRemoveItem={(id) => setQty(id, 0)}
                 onClearCart={clearCart}
                 onCheckout={() => setPaymentOpen(true)}
               />
@@ -207,7 +206,6 @@ export default function CashierPage() {
           cartExpanded={cartExpanded}
           onToggleExpanded={() => setCartExpanded((expanded) => !expanded)}
           onUpdateQuantity={setQty}
-          onRemoveItem={(id) => setQty(id, 0)}
           onClearCart={clearCart}
           onCheckout={() => {
             setPaymentOpen(true);

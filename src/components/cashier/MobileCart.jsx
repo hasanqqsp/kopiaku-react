@@ -15,11 +15,10 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import CloseIcon from "@mui/icons-material/Close";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 const currency = (v) =>
   new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }).format(
-    v
+    v,
   );
 
 const MobileCart = ({
@@ -29,7 +28,6 @@ const MobileCart = ({
   cartExpanded,
   onToggleExpanded,
   onUpdateQuantity,
-  onRemoveItem,
   onClearCart,
   onCheckout,
 }) => {
@@ -150,12 +148,6 @@ const MobileCart = ({
                               }
                             >
                               <AddCircleOutlineIcon />
-                            </IconButton>
-                            <IconButton
-                              size="small"
-                              onClick={() => onRemoveItem(it.id)}
-                            >
-                              <DeleteOutlineIcon />
                             </IconButton>
                           </Box>
                         }

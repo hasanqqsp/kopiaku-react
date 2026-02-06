@@ -7,14 +7,13 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
 const currency = (v) =>
   new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }).format(
-    v
+    v,
   );
 
-const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
+const CartItem = ({ item, onUpdateQuantity }) => {
   return (
     <ListItem
       secondaryAction={
@@ -37,9 +36,6 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
             onClick={() => onUpdateQuantity(item.id, item.qty + 1)}
           >
             <AddCircleOutlineIcon />
-          </IconButton>
-          <IconButton size="small" onClick={() => onRemove(item.id)}>
-            <DeleteOutlineIcon />
           </IconButton>
         </Box>
       }
