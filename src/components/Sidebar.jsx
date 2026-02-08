@@ -33,7 +33,6 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import imageSrc from "../assets/kopiaku-logo.png";
 import { useNavigate } from "@tanstack/react-router";
 import { drawerWidth, collapsedWidth } from "../config/drawer";
-import { bottomSpacing } from "../config/ui";
 import useAuthStore from "../stores/authStore";
 import { checkOut } from "../utils/api";
 const primaryBlue = "#1c0cdc";
@@ -224,8 +223,8 @@ export default function Sidebar({ onSelect, open = true, setOpen }) {
 
       <Divider sx={{ borderColor: alpha(theme.palette.common.white, 0.12) }} />
 
-      {/* Scrollable menu area. pb keeps last item visible above bottom user box */}
-      <Box sx={{ overflow: "auto", flex: 1, pb: `${bottomSpacing}px` }}>
+      {/* Scrollable menu area */}
+      <Box sx={{ overflow: "auto", flex: 1 }}>
         <List>
           {filteredMenuItems.map((item) => (
             <ListItem key={item.id} disablePadding>
@@ -281,17 +280,10 @@ export default function Sidebar({ onSelect, open = true, setOpen }) {
         </List>
       </Box>
 
-      {/* Bottom user box anchored to bottom */}
-      <Box
-        sx={{
-          px: 2,
-          py: 1.5,
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-        }}
-      >
+      <Divider sx={{ borderColor: alpha(theme.palette.common.white, 0.12) }} />
+
+      {/* Bottom user box */}
+      <Box sx={{ px: 2, py: 1.5 }}>
         <Divider
           sx={{ borderColor: alpha(theme.palette.common.white, 0.12), mb: 1 }}
         />
