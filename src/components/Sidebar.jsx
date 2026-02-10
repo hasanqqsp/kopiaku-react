@@ -23,6 +23,7 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import Button from "@mui/material/Button";
 import LogoutIcon from "@mui/icons-material/Logout";
 import CompareIcon from "@mui/icons-material/Compare";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -32,7 +33,6 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 import imageSrc from "../assets/kopiaku-logo.png";
 import { useNavigate } from "@tanstack/react-router";
 import { drawerWidth, collapsedWidth } from "../config/drawer";
-import { bottomSpacing } from "../config/ui";
 import useAuthStore from "../stores/authStore";
 import { checkOut } from "../utils/api";
 const primaryBlue = "#1c0cdc";
@@ -108,7 +108,11 @@ export default function Sidebar({ onSelect, open = true, setOpen }) {
   };
 
   const onLogout = () => {
-    setLogoutDialogOpen(true);
+    if (user?.role === "Admin") {
+      handleLogoutOnly();
+    } else {
+      setLogoutDialogOpen(true);
+    }
   };
 
   const handleEndShift = async () => {
@@ -144,16 +148,16 @@ export default function Sidebar({ onSelect, open = true, setOpen }) {
       const found = filteredMenuItems.find(
         (m) =>
           m.path &&
-          (m.path === path || (m.path !== "/" && path.startsWith(m.path)))
+          (m.path === path || (m.path !== "/" && path.startsWith(m.path))),
       );
       return found ? found.id : "dashboard";
     },
-    [filteredMenuItems]
+    [filteredMenuItems],
   );
   const [selected, setSelected] = React.useState(() =>
     getSelectedFromPath(
-      typeof window !== "undefined" ? window.location.pathname : "/"
-    )
+      typeof window !== "undefined" ? window.location.pathname : "/",
+    ),
   );
 
   React.useEffect(() => {
@@ -167,8 +171,8 @@ export default function Sidebar({ onSelect, open = true, setOpen }) {
   const paperWidth = isMobile
     ? drawerWidth
     : open
-    ? drawerWidth
-    : collapsedWidth;
+      ? drawerWidth
+      : collapsedWidth;
 
   const drawerSx = {
     width: paperWidth,
@@ -219,8 +223,8 @@ export default function Sidebar({ onSelect, open = true, setOpen }) {
 
       <Divider sx={{ borderColor: alpha(theme.palette.common.white, 0.12) }} />
 
-      {/* Scrollable menu area. pb keeps last item visible above bottom user box */}
-      <Box sx={{ overflow: "auto", flex: 1, pb: `${bottomSpacing}px` }}>
+      {/* Scrollable menu area */}
+      <Box sx={{ overflow: "auto", flex: 1 }}>
         <List>
           {filteredMenuItems.map((item) => (
             <ListItem key={item.id} disablePadding>
@@ -276,17 +280,10 @@ export default function Sidebar({ onSelect, open = true, setOpen }) {
         </List>
       </Box>
 
-      {/* Bottom user box anchored to bottom */}
-      <Box
-        sx={{
-          px: 2,
-          py: 1.5,
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-        }}
-      >
+      <Divider sx={{ borderColor: alpha(theme.palette.common.white, 0.12) }} />
+
+      {/* Bottom user box */}
+      <Box sx={{ px: 2, py: 1.5 }}>
         <Divider
           sx={{ borderColor: alpha(theme.palette.common.white, 0.12), mb: 1 }}
         />
@@ -316,6 +313,21 @@ export default function Sidebar({ onSelect, open = true, setOpen }) {
           </Box>
 
           <Box sx={{ display: open ? "block" : "none" }}>
+            <Button
+              onClick={() => navigate({ to: "/account" })}
+              variant="outlined"
+              size="small"
+              startIcon={<AccountCircleIcon />}
+              fullWidth
+              sx={{
+                color: primaryContrast,
+                borderColor: alpha(primaryContrast, 0.12),
+                textTransform: "none",
+                mb: 1,
+              }}
+            >
+              Akun
+            </Button>
             <Button
               onClick={onLogout}
               variant="outlined"

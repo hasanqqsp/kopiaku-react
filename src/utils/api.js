@@ -45,6 +45,7 @@ export async function login(email, password) {
         id
         isActive
         name
+        nickname
         profilePictureUrl
         token
         username
@@ -141,6 +142,7 @@ export async function getCurrentUser() {
       myProfile {
         id
         name
+        nickname
         username
         email
         role
@@ -166,7 +168,96 @@ export async function getCurrentUser() {
     return response.data.data.myProfile;
   } catch (err) {
     console.error("getCurrentUser error:", err);
-    // throw err;
+    throw err;
+  }
+}
+
+export async function updateMyProfile({
+  name,
+  nickname,
+  email,
+  contact,
+  profilePicture,
+}) {
+  const formData = new FormData();
+
+  const mutation = `
+    mutation UpdateMyProfile($input: UpdateUserProfileInput!, $profilePicture: Upload) {
+      updateMyProfile(input: $input, profilePicture: $profilePicture) {
+        id
+        name
+        nickname
+        username
+        email
+        role
+        contact
+        isActive
+        profilePictureUrl
+      }
+    }
+  `;
+
+  const operations = JSON.stringify({
+    query: mutation,
+    variables: {
+      input: { name, nickname, email, contact },
+      profilePicture: profilePicture ? null : undefined,
+    },
+  });
+
+  const mapObj = {};
+  if (profilePicture) {
+    mapObj["0"] = ["variables.profilePicture"];
+  }
+  const map = JSON.stringify(mapObj);
+
+  formData.append("operations", operations);
+  formData.append("map", map);
+  if (profilePicture) {
+    formData.append("0", profilePicture);
+  }
+
+  try {
+    const response = await axiosWithAuth.post("", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        "GraphQL-Preflight": 1,
+      },
+    });
+    if (response.data.errors) {
+      throw new Error(response.data.errors[0].message);
+    }
+    return response.data.data.updateMyProfile;
+  } catch (err) {
+    console.error("updateMyProfile error:", err);
+    throw err;
+  }
+}
+
+export async function changePassword({ currentPassword, newPassword }) {
+  const mutation = `
+    mutation ChangePassword($input: ChangePasswordInput!) {
+      changePassword(input: $input)
+    }
+  `;
+  try {
+    const response = await axiosWithAuth.post("", {
+      query: mutation,
+      variables: {
+        input: { currentPassword, newPassword },
+      },
+    });
+    if (response.data.errors) {
+      throw new Error(response.data.errors[0].message);
+    }
+    const success = response.data.data.changePassword;
+    if (!success) {
+      throw new Error("Failed to change password");
+    }
+    return { success: true, message: "Password changed successfully" };
+  } catch (err) {
+    console.error("changePassword error:", err);
+    throw err;
   }
 }
 
@@ -406,14 +497,14 @@ export const updateUserProfile = async ({ userId, input, file }) => {
           input,
           profilePicture: file ? null : undefined,
         },
-      })
+      }),
     );
 
     formData.append(
       "map",
       JSON.stringify({
         0: ["variables.profilePicture"],
-      })
+      }),
     );
 
     formData.append("0", file);
@@ -462,6 +553,9 @@ export const getMyPresence = async () => {
       myPresence {
         id
         userId
+        user {
+         name
+        }
         imageUrl
         checkInTime
         validated
@@ -575,6 +669,9 @@ export const fetchPresences = async ({
         nodes {
           id
           userId
+          user {
+            name
+          }
           imageUrl
           checkInTime
           validated
@@ -782,7 +879,7 @@ export async function createMenu({ menu, image }) {
         menu,
         image: null, // harus null di operasi karena upload dipisah
       },
-    })
+    }),
   );
 
   formData.append("map", JSON.stringify({ 0: ["variables.image"] }));
@@ -861,7 +958,7 @@ export async function updateMenu({ id, menu, image }) {
     JSON.stringify({
       query: mutation,
       variables,
-    })
+    }),
   );
 
   if (hasImage) {
@@ -1099,11 +1196,11 @@ export async function deleteTransactionAPI(transactionId) {
 
   return response.data.data.deleteTransaction;
 }
-export async function getTransactionsAPI() {
+export async function getTransactionsAPI({ take = 10, skip = 0 } = {}) {
   const query = `
-    query GetTransactions {
-      transactions(first: 1000) {
-        nodes {
+    query GetTransactions($take: Int, $skip: Int) {
+      transactions(take: $take, skip: $skip) {
+        items {
           id
           userId
           totalAmount
@@ -1117,12 +1214,14 @@ export async function getTransactionsAPI() {
             name
           }
         }
+        totalCount
       }
     }
   `;
 
   const response = await axiosWithAuth.post("/", {
     query,
+    variables: { take, skip },
   });
 
   return response.data.data.transactions;
@@ -1224,11 +1323,14 @@ export async function getStocks() {
   return response.data.data.stocks;
 }
 
-export async function getTransactionsByUserIdAPI(userId) {
+export async function getTransactionsByUserIdAPI(
+  userId,
+  { take = 10, skip = 0 } = {},
+) {
   const query = `
-    query GetTransactionsByUserId($userId: String!) {
-      transactionsByUserId(userId: $userId, first: 1000) {
-        nodes {
+    query GetTransactionsByUserId($userId: String!, $take: Int, $skip: Int) {
+      transactionsByUserId(userId: $userId, take: $take, skip: $skip) {
+        items {
           id
           userId
           totalAmount
@@ -1243,13 +1345,14 @@ export async function getTransactionsByUserIdAPI(userId) {
             
           }
         }
+        totalCount
       }
     }
   `;
 
   const response = await axiosWithAuth.post("/", {
     query,
-    variables: { userId },
+    variables: { userId, take, skip },
   });
 
   return response.data.data.transactionsByUserId;
@@ -1316,7 +1419,7 @@ export function createFormDataForFileUpload(query, variables) {
         return null; // Replace file with null in variables
       }
       return value;
-    })
+    }),
   );
 
   // Add the operations (query + variables)
@@ -1418,7 +1521,7 @@ export async function updateOrCreateHeroContent(input) {
 
 export async function updateOrCreateHeroContentWithImage(
   input,
-  backgroundImageFile
+  backgroundImageFile,
 ) {
   try {
     // Use FormData for file upload
