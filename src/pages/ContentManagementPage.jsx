@@ -438,7 +438,7 @@ export default function ContentManagementPage() {
                 bgcolor: '#1e40af'
               }
             }}
-            onClick={() => window.open('/landing-preview', '_blank')}
+            onClick={() => window.open('https://kopiaku.biz.id', '_blank')}
           >
             Lihat Preview Lengkap
           </Button>
